@@ -95,6 +95,23 @@ class Lattice:
                 trans_vector[1] = (0,W)
             return coordinate, trans_vector
         # =================================================================
+        elif self.name == 'Honeycomb_YC':
+            coordinate = []
+            for ord2d in self.siteorder_2d:
+                row_ = ord2d[0]
+                col_ = ord2d[1]
+                xx_ = col_ * np.sqrt(3)/2
+                yy_ = (row_+row_%2)/2*3 -(row_%2)*(2-col_%2) -(col_%2)/2
+                coordinate.append((xx_, yy_))
+            # as the PBC information missing, we must specify where 
+            # every site end up with by adding the trans_vector
+            trans_vector = [(0,0), (0,0)]
+            if self.boundary_x == 'PBC':
+                trans_vector[0] = (np.sqrt(3)/2*L,0)
+            if self.boundary_y == 'PBC':
+                trans_vector[1] = (0,W/2*3)
+            return coordinate, trans_vector
+        # =================================================================
         else:
             return None, None
 
@@ -181,7 +198,7 @@ class Lattice:
 
 
 if __name__=="__main__":
-    latt1 = Lattice(name='Square')
+    latt1 = Lattice(name='Honeycomb_YC', width=6, )
     print(latt1)
     print(latt1.siteorder_1d)
     print(latt1.siteorder_2d)
