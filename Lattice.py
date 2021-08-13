@@ -16,7 +16,7 @@ def get_dist(XY1, XY2):
     return np.sqrt((XY1-XY2)@(XY1-XY2).transpose())
 
 class Lattice:
-    def __init__(self, name='Square', length=20, width=4, boundary_x='OBC', boundary_y='PBC'):
+    def __init__(self, name='Square', length=8, width=4, boundary_x='OBC', boundary_y='PBC'):
         self.name = name
         self.length = length
         self.width = width
@@ -112,6 +112,31 @@ class Lattice:
                 trans_vector[1] = (0,W/2*3)
             return coordinate, trans_vector
         # =================================================================
+        elif self.name == 'Kagome_YC':
+            coordinate = []
+            for ord2d in self.siteorder_2d:
+                row_ = ord2d[0]
+                col_ = ord2d[1]
+                if (row_-1)%3==0:
+                    xx_ = col_ * np.sqrt(3) - np.sqrt(3)/2
+                else:
+                    xx_ = col_ * np.sqrt(3)
+                if row_%3==0:
+                    yy_ = row_/3*2 - col_
+                elif (row_-1)%3==0:
+                    yy_ = (row_-1)/3*2 + 0.5 - col_
+                else:
+                    yy_ = (row_-2)/3*2 + 1 - col_
+                coordinate.append((xx_, yy_))
+            # as the PBC information missing, we must specify where 
+            # every site end up with by adding the trans_vector
+            trans_vector = [(0,0), (0,0)]
+            if self.boundary_x == 'PBC':
+                trans_vector[0] = (np.sqrt(3)*L,-L)
+            if self.boundary_y == 'PBC':
+                trans_vector[1] = (0,W/3*2)
+            return coordinate, trans_vector
+        # =================================================================
         else:
             return None, None
 
@@ -129,21 +154,21 @@ class Lattice:
         for si in range(N):
             for sj in range(si+1,N):
                 Dist_ = get_dist(XY[si,:], XY[sj,:])
-                if np.abs(Dist_-1)<1e-15: 
+                if np.abs(Dist_-1)<1e-13: 
                     NNPairs.append((si,sj,0,0))
                 if self.boundary_x == 'PBC':
                     Dist_ = get_dist(XY[si,:], XY[sj,:]+Trans[0,:])
-                    if np.abs(Dist_-1)<1e-15: 
+                    if np.abs(Dist_-1)<1e-13: 
                         NNPairs.append((si,sj,1,0))
                     Dist_ = get_dist(XY[si,:], XY[sj,:]-Trans[0,:])
-                    if np.abs(Dist_-1)<1e-15: 
+                    if np.abs(Dist_-1)<1e-13: 
                         NNPairs.append((si,sj,-1,0))
                 if self.boundary_y == 'PBC':
                     Dist_ = get_dist(XY[si,:], XY[sj,:]+Trans[1,:])
-                    if np.abs(Dist_-1)<1e-15: 
+                    if np.abs(Dist_-1)<1e-13: 
                         NNPairs.append((si,sj,0,1))
                     Dist_ = get_dist(XY[si,:], XY[sj,:]-Trans[1,:])
-                    if np.abs(Dist_-1)<1e-15: 
+                    if np.abs(Dist_-1)<1e-13: 
                         NNPairs.append((si,sj,0,-1))
         return NNPairs
     
@@ -198,7 +223,7 @@ class Lattice:
 
 
 if __name__=="__main__":
-    latt1 = Lattice(name='Honeycomb_YC', width=6, )
+    latt1 = Lattice(name='Kagome_YC', width=12, boundary_x='PBC')
     print(latt1)
     print(latt1.siteorder_1d)
     print(latt1.siteorder_2d)
