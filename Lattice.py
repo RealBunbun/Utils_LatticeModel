@@ -77,22 +77,14 @@ class Lattice:
             coordinate = [Ord2d[::-1] for Ord2d in self.siteorder_2d ]
             # as the PBC information missing, we must specify where 
             # every site end up with by adding the trans_vector
-            trans_vector = [(0,0), (0,0)]
-            if self.boundary_x == 'PBC':
-                trans_vector[0] = (L,0)
-            if self.boundary_y == 'PBC':
-                trans_vector[1] = (0,W)
+            trans_vector = [(L,0), (0,W)]
             return coordinate, trans_vector
         # =================================================================
         elif self.name == 'Triangle_YC':
             coordinate = [(Ord2d[1]*np.sqrt(3)/2, Ord2d[0]+Ord2d[1]*0.5) for Ord2d in self.siteorder_2d]
             # as the PBC information missing, we must specify where 
             # every site end up with by adding the trans_vector
-            trans_vector = [(0,0), (0,0)]
-            if self.boundary_x == 'PBC':
-                trans_vector[0] = (np.sqrt(3)/2*L,0.5*L)
-            if self.boundary_y == 'PBC':
-                trans_vector[1] = (0,W)
+            trans_vector = [(np.sqrt(3)/2*L,0.5*L), (0,W)]
             return coordinate, trans_vector
         # =================================================================
         elif self.name == 'Honeycomb_YC':
@@ -105,11 +97,8 @@ class Lattice:
                 coordinate.append((xx_, yy_))
             # as the PBC information missing, we must specify where 
             # every site end up with by adding the trans_vector
-            trans_vector = [(0,0), (0,0)]
-            if self.boundary_x == 'PBC':
-                trans_vector[0] = (np.sqrt(3)/2*L,0)
-            if self.boundary_y == 'PBC':
-                trans_vector[1] = (0,W/2*3)
+            trans_vector = [(np.sqrt(3)/2*L,0),
+                            (0,W/2*3)]
             return coordinate, trans_vector
         # =================================================================
         elif self.name == 'Kagome_YC':
@@ -122,11 +111,8 @@ class Lattice:
                 coordinate.append((xx_, yy_))
             # as the PBC information missing, we must specify where 
             # every site end up with by adding the trans_vector
-            trans_vector = [(0,0), (0,0)]
-            if self.boundary_x == 'PBC':
-                trans_vector[0] = (np.sqrt(3)*L,-L)
-            if self.boundary_y == 'PBC':
-                trans_vector[1] = (0,W/3*2)
+            trans_vector = [(np.sqrt(3)*L,-L),
+                            (0,W/3*2)]
             return coordinate, trans_vector
         # =================================================================
         else:
@@ -215,10 +201,6 @@ class Lattice:
 
 
 if __name__=="__main__":
-    latt1 = Lattice(name='Kagome_YC', width=9, boundary_y='PBC')
-    print(latt1)
-    print(latt1.siteorder_1d)
-    print(latt1.siteorder_2d)
-    print(latt1.coordinate)
+    latt1 = Lattice(name='Square', width=4, boundary_y='PBC')
     latt1.plot_latt()
     
