@@ -16,7 +16,7 @@ def get_dist(XY1, XY2):
     return np.sqrt((XY1-XY2)@(XY1-XY2).transpose())
 
 class Lattice:
-    def __init__(self, name='Square', length=8, width=4, boundary_x='OBC', boundary_y='PBC'):
+    def __init__(self, name='Square', length=12, width=4, boundary_x='OBC', boundary_y='PBC'):
         self.name = name
         self.length = length
         self.width = width
@@ -117,16 +117,8 @@ class Lattice:
             for ord2d in self.siteorder_2d:
                 row_ = ord2d[0]
                 col_ = ord2d[1]
-                if (row_-1)%3==0:
-                    xx_ = col_ * np.sqrt(3) - np.sqrt(3)/2
-                else:
-                    xx_ = col_ * np.sqrt(3)
-                if row_%3==0:
-                    yy_ = row_/3*2 - col_
-                elif (row_-1)%3==0:
-                    yy_ = (row_-1)/3*2 + 0.5 - col_
-                else:
-                    yy_ = (row_-2)/3*2 + 1 - col_
+                xx_ = col_ * np.sqrt(3) - (row_%3==1)*np.sqrt(3)/2
+                yy_ = (row_-row_%3)*2/3 + (row_%3)*0.5 - col_
                 coordinate.append((xx_, yy_))
             # as the PBC information missing, we must specify where 
             # every site end up with by adding the trans_vector
@@ -223,7 +215,7 @@ class Lattice:
 
 
 if __name__=="__main__":
-    latt1 = Lattice(name='Kagome_YC', width=12, boundary_x='PBC')
+    latt1 = Lattice(name='Kagome_YC', width=9, boundary_y='PBC')
     print(latt1)
     print(latt1.siteorder_1d)
     print(latt1.siteorder_2d)
