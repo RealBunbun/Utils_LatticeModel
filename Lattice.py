@@ -88,6 +88,8 @@ class Lattice:
             return coordinate, trans_vector
         # =================================================================
         elif self.name == 'Honeycomb_YC':
+            if self.width%2:
+                raise Exception('Error: width of Honeycomb_YC must be even')
             coordinate = []
             for ord2d in self.siteorder_2d:
                 row_ = ord2d[0]
@@ -203,6 +205,6 @@ class Lattice:
 
 
 if __name__=="__main__":
-    latt1 = Lattice(name='Kagome_YC', width=6, boundary_y='PBC')
+    latt1 = Lattice(name='Honeycomb_YC', width=5, boundary_y='PBC')
     latt1.plot_latt()
     
