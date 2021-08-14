@@ -102,6 +102,8 @@ class Lattice:
             return coordinate, trans_vector
         # =================================================================
         elif self.name == 'Kagome_YC':
+            if self.width%3: 
+                raise Exception('Error: width must be multiples of 3 in Kagome_YC')
             coordinate = []
             for ord2d in self.siteorder_2d:
                 row_ = ord2d[0]
@@ -201,6 +203,6 @@ class Lattice:
 
 
 if __name__=="__main__":
-    latt1 = Lattice(name='Square', width=4, boundary_y='PBC')
+    latt1 = Lattice(name='Kagome_YC', width=6, boundary_y='PBC')
     latt1.plot_latt()
     
