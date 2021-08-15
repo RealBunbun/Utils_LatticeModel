@@ -154,6 +154,37 @@ class Lattice:
                         NNPairs.append((si,sj,0,-1))
         return NNPairs
     
+    def get_bond(self, distance=1):
+        """
+        obtain all pairs of sites with distance
+        according to the self.coordinates
+        """
+        XY = np.array(self.coordinate)
+        N = self.num_site
+        Trans = np.array(self.trans_vector)
+
+        Pairs = []
+        for si in range(N):
+            for sj in range(si+1,N):
+                Dist_ = get_dist(XY[si,:], XY[sj,:])
+                if np.abs(Dist_-distance)<1e-13: 
+                    Pairs.append((si,sj,0,0))
+                if self.boundary_x == 'PBC':
+                    Dist_ = get_dist(XY[si,:], XY[sj,:]+Trans[0,:])
+                    if np.abs(Dist_-distance)<1e-13: 
+                        Pairs.append((si,sj,1,0))
+                    Dist_ = get_dist(XY[si,:], XY[sj,:]-Trans[0,:])
+                    if np.abs(Dist_-distance)<1e-13: 
+                        Pairs.append((si,sj,-1,0))
+                if self.boundary_y == 'PBC':
+                    Dist_ = get_dist(XY[si,:], XY[sj,:]+Trans[1,:])
+                    if np.abs(Dist_-distance)<1e-13: 
+                        Pairs.append((si,sj,0,1))
+                    Dist_ = get_dist(XY[si,:], XY[sj,:]-Trans[1,:])
+                    if np.abs(Dist_-distance)<1e-13: 
+                        Pairs.append((si,sj,0,-1))
+        return Pairs
+    
 
     def plot_latt(self):
         """
