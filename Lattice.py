@@ -10,7 +10,7 @@ import scipy.io as spio
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-
+from Basis import Basis
 
 def get_dist(XY1, XY2):
     return np.sqrt((XY1-XY2)@(XY1-XY2).transpose())
@@ -63,6 +63,37 @@ class Lattice:
         return [(si%W, si//W) for si in range(N)]
 
     def get_coordinate(self):
+        """
+        Given the type of lattice
+        obtain the real-space coordinate of each site
+        return a 2d vector (#x, #y)
+        !!! Note the difference with siteorder_2d 
+                     (exchanging row with col)
+        """
+        W = self.width
+        L = self.length
+        Basis_ = next(item for item in Basis if item["name"] == self.name)
+        unit_cell = Basis_['unit_cell']
+        prim_vec = np.array(Basis_['primitive_vector'])
+
+        # checking the width
+        num_site_unit = len(unit_cell)
+        if W%num_site_unit:
+            raise Exception('Error: width of Honeycomb_YC must be multiples of %d'%num_site_unit)
+        else:
+            W = W//num_site_unit
+
+        # generating coordinates
+        coordinate = []
+        for ix in range(L):
+            for iy in range(W):
+                for xy_ in unit_cell:
+                    xy_ = np.array(xy_)
+                    coordinate.append(xy_ + ix*prim_vec[0] + iy*prim_vec[1])
+        trans_vector = [L*prim_vec[0], W*prim_vec[1]]
+        return coordinate, trans_vector
+
+    def get_coordinate_bak(self):
         """
         Given the type of lattice
         obtain the real-space coordinate of each site
@@ -163,25 +194,26 @@ class Lattice:
         N = self.num_site
         Trans = np.array(self.trans_vector)
 
+        tol = 1e-13
         Pairs = []
         for si in range(N):
             for sj in range(si+1,N):
                 Dist_ = get_dist(XY[si,:], XY[sj,:])
-                if np.abs(Dist_-distance)<1e-13: 
+                if np.abs(Dist_-distance)<tol: 
                     Pairs.append((si,sj,0,0))
                 if self.boundary_x == 'PBC':
                     Dist_ = get_dist(XY[si,:], XY[sj,:]+Trans[0,:])
-                    if np.abs(Dist_-distance)<1e-13: 
+                    if np.abs(Dist_-distance)<tol: 
                         Pairs.append((si,sj,1,0))
                     Dist_ = get_dist(XY[si,:], XY[sj,:]-Trans[0,:])
-                    if np.abs(Dist_-distance)<1e-13: 
+                    if np.abs(Dist_-distance)<tol: 
                         Pairs.append((si,sj,-1,0))
                 if self.boundary_y == 'PBC':
                     Dist_ = get_dist(XY[si,:], XY[sj,:]+Trans[1,:])
-                    if np.abs(Dist_-distance)<1e-13: 
+                    if np.abs(Dist_-distance)<tol: 
                         Pairs.append((si,sj,0,1))
                     Dist_ = get_dist(XY[si,:], XY[sj,:]-Trans[1,:])
-                    if np.abs(Dist_-distance)<1e-13: 
+                    if np.abs(Dist_-distance)<tol: 
                         Pairs.append((si,sj,0,-1))
         return Pairs
     
@@ -191,7 +223,8 @@ class Lattice:
         plot the lattice sites
         """
         XY = np.array(self.coordinate)
-        NNPairs = self.get_nearestneighbor()
+        dist_ = get_dist(self.coordinate[0],self.coordinate[1])
+        NNPairs = self.get_bond(distance=dist_)
         TransVector = np.array(self.trans_vector)
         TransX = TransVector[0,:]
         TransY = TransVector[1,:]
@@ -236,6 +269,6 @@ class Lattice:
 
 
 if __name__=="__main__":
-    latt1 = Lattice(name='Honeycomb_YC', width=5, boundary_y='PBC')
+    latt1 = Lattice(name='Kagome_YC', width=6, boundary_y='PBC')
     latt1.plot_latt()
     
