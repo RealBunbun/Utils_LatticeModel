@@ -222,6 +222,7 @@ class Lattice:
         """
         plot the lattice sites
         """
+        N = self.num_site
         XY = np.array(self.coordinate)
         dist_ = get_dist(self.coordinate[0],self.coordinate[1])
         NNPairs = self.get_bond(distance=dist_)
@@ -232,6 +233,10 @@ class Lattice:
         LightBlue = [.6,.6,.9]
         ax = plt.axes()
         ax.plot(XY[:,0], XY[:,1], 'ko', zorder=100)
+
+        for si in range(N):
+            ax.text(XY[si,0], XY[si,1], r'%d'%si, transform=ax.transData, color='r',zorder=150,fontsize=6)
+
         if self.boundary_x == 'PBC':
             ax.plot(XY[:,0]+TransX[0], 
                     XY[:,1]+TransX[1], 'o', color='lightgrey', zorder=100)
